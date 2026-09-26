@@ -51,6 +51,113 @@ The entire application runs from a single Python file. No backend servers, datab
 
 ---
 
+## Architecture
+
+The project follows a simple layered architecture designed for clarity and easy extension.
+┌─────────────────────────────────────────────────────────────┐
+│                        User Interface                       │
+│                     (Streamlit Dashboard)                   │
+│  • Sidebar controls                                         │
+│  • Metric cards                                             │
+│  • Charts                                                   │
+│  • Alerts & Recommendations                                 │
+└────────────────────────────┬────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────┐
+│                     Application Layer                       │
+│                         (app.py)                            │
+│  • Session state management                                 │
+│  • UI rendering                                             │
+│  • User input handling                                      │
+│  • Simulation loop control                                  │
+└────────────┬───────────────────────────────┬────────────────┘
+│                               │
+▼                               ▼
+┌──────────────────────────┐    ┌────────────────────────────┐
+│   Sensor Simulation      │    │     Analysis Engine        │
+│                          │    │                            │
+│  • SoC                   │    │  • Effective SoC           │
+│  • Voltage               │    │  • Capacity loss           │
+│  • Current               │    │  • Range estimation        │
+│  • Battery Temperature   │    │  • Charging efficiency     │
+│  • Ambient Temperature   │    │  • Alerts                  │
+│  • Power                 │    │  • Recommendations         │
+└────────────┬─────────────┘    └────────────▲───────────────┘
+│                               │
+└───────────────┬───────────────┘
+▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Battery Physical Model                   │
+│                                                             │
+│  • Temperature dynamics                                     │
+│  • Capacity factor (temperature influence)                  │
+│  • Charge / Discharge logic                                 │
+│  • Mode handling (Parking / Driving / Charging)             │
+└─────────────────────────────────────────────────────────────┘
+text### Layers Overview
+
+| Layer                  | Responsibility                                      |
+|------------------------|-----------------------------------------------------|
+| **UI Layer**           | Display data, charts, controls, and alerts          |
+| **Application Layer**  | Connects all modules and manages simulation state   |
+| **Sensor Layer**       | Generates realistic sensor readings                 |
+| **Analysis Layer**     | Calculates effective SoC, range, alerts, and advice |
+| **Physical Model**     | Simulates battery behavior under cold conditions    |
+
+---
+
+## Data Flow
+
+Here is how data moves through the system on every simulation step:
+
+User changes temperature or vehicle mode
+↓
+Application Layer receives the input
+↓
+Battery Physical Model updates its internal state
+Battery temperature moves toward ambient temperature
+Capacity factor is recalculated
+SoC changes based on current mode
+↓
+
+Sensor Layer generates readings from the model state
+(with a small amount of noise for realism)
+↓
+Analysis Engine processes the sensor data:
+Calculates Effective SoC
+Estimates remaining range
+Evaluates charging efficiency
+Generates alerts and recommendations
+↓
+
+UI Layer renders the updated metrics, charts, and messages
+
+text### Detailed Data Path
+
+| Stage                  | Input                              | Processing                              | Output                              |
+|------------------------|------------------------------------|-----------------------------------------|-------------------------------------|
+| User Input             | Sidebar controls                   | —                                       | Ambient temperature, mode           |
+| Battery Model          | Previous state + user input        | Temperature & SoC physics               | Updated battery state               |
+| Sensors                | Battery state                      | Add realistic noise                     | Raw sensor readings                 |
+| Analysis               | Sensor data + battery state        | Calculations & rule-based logic         | Effective SoC, range, alerts        |
+| UI                     | Analysis results + history         | Rendering                               | Dashboard                           |
+
+---
+
+## Simulation Step (Simplified)
+
+Every 1–2 seconds (or on manual step):
+
+1. Read user inputs
+2. Update battery model
+3. Generate sensor data
+4. Run analysis
+5. Render dashboard
+6. Store data point in history (for charts)
+
+---
+
 ## Installation
 
 ### 1. Clone the repository
