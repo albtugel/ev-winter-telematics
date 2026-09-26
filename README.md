@@ -54,56 +54,16 @@ The entire application runs from a single Python file. No backend servers, datab
 ## Architecture
 
 The project follows a simple layered architecture designed for clarity and easy extension.
-┌─────────────────────────────────────────────────────────────┐
-│                        User Interface                       │
-│                     (Streamlit Dashboard)                   │
-│  • Sidebar controls                                         │
-│  • Metric cards                                             │
-│  • Charts                                                   │
-│  • Alerts & Recommendations                                 │
-└────────────────────────────┬────────────────────────────────┘
-│
-▼
-┌─────────────────────────────────────────────────────────────┐
-│                     Application Layer                       │
-│                         (app.py)                            │
-│  • Session state management                                 │
-│  • UI rendering                                             │
-│  • User input handling                                      │
-│  • Simulation loop control                                  │
-└────────────┬───────────────────────────────┬────────────────┘
-│                               │
-▼                               ▼
-┌──────────────────────────┐    ┌────────────────────────────┐
-│   Sensor Simulation      │    │     Analysis Engine        │
-│                          │    │                            │
-│  • SoC                   │    │  • Effective SoC           │
-│  • Voltage               │    │  • Capacity loss           │
-│  • Current               │    │  • Range estimation        │
-│  • Battery Temperature   │    │  • Charging efficiency     │
-│  • Ambient Temperature   │    │  • Alerts                  │
-│  • Power                 │    │  • Recommendations         │
-└────────────┬─────────────┘    └────────────▲───────────────┘
-│                               │
-└───────────────┬───────────────┘
-▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Battery Physical Model                   │
-│                                                             │
-│  • Temperature dynamics                                     │
-│  • Capacity factor (temperature influence)                  │
-│  • Charge / Discharge logic                                 │
-│  • Mode handling (Parking / Driving / Charging)             │
-└─────────────────────────────────────────────────────────────┘
-text### Layers Overview
 
-| Layer                  | Responsibility                                      |
-|------------------------|-----------------------------------------------------|
-| **UI Layer**           | Display data, charts, controls, and alerts          |
-| **Application Layer**  | Connects all modules and manages simulation state   |
-| **Sensor Layer**       | Generates realistic sensor readings                 |
-| **Analysis Layer**     | Calculates effective SoC, range, alerts, and advice |
-| **Physical Model**     | Simulates battery behavior under cold conditions    |
+flowchart TD
+    A[User Interface<br/>Streamlit Dashboard] --> B[Application Layer<br/>app.py]
+    B --> C[Battery Physical Model]
+    B --> D[Sensor Simulation]
+    B --> E[Analysis Engine]
+    
+    C --> D
+    D --> E
+    E --> A
 
 ---
 
